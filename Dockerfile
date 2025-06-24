@@ -27,12 +27,13 @@ RUN mkdir -p /app/data && chown -R appuser:appgroup /app
 
 USER appuser
 
-EXPOSE 8080
+EXPOSE 8080 9090
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 ENV PORT=8080
+ENV GRPC_PORT=9090
 ENV GEOIP_DB_PATH=/app/data/GeoLite2-Country.mmdb
 ENV LOG_LEVEL=info
 

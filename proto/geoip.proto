@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package geoip;
+option go_package = "geoip-service/proto";
+
+// GeoIP service definition
+service GeoIPService {
+  // Check if IP address is allowed in the given countries
+  rpc CheckCountry(CheckCountryRequest) returns (CheckCountryResponse);
+  
+  // Health check
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+// Request message for checking country
+message CheckCountryRequest {
+  string ip_address = 1;
+  repeated string allowed_countries = 2;
+}
+
+// Response message for country check
+message CheckCountryResponse {
+  bool allowed = 1;
+  string country = 2;
+}
+
+// Health check request
+message HealthRequest {}
+
+// Health check response
+message HealthResponse {
+  string status = 1;
+  string service = 2;
+} 

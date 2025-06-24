@@ -1,10 +1,13 @@
 # GeoIP Service
 
+## Submission Notes
+
 HTTP API service that validates IP addresses against allowed countries using MaxMind's GeoLite2 database.
 
 ## Features
 
 - **HTTP API**: RESTful endpoint for IP country validation
+- **gRPC API**: High-performance gRPC endpoint for IP country validation
 - **Production Ready**: Structured logging, health checks, graceful shutdown
 - **Docker Support**: Multi-stage builds with security best practices
 - **Configurable**: Environment-based configuration
@@ -41,18 +44,22 @@ go build -o geoip-server ./cmd/geoip-server
 ./geoip-server
 ```
 
+The service will start on port 8080 (HTTP) and 9090 (gRPC) by default.
+
 ### Docker
 
 ```bash
 # Build and run
 docker build -t geoip-service:latest .
 mkdir -p ./data && cp GeoLite2-Country.mmdb ./data/
-docker run -d --name geoip-service -p 8080:8080 -v $(pwd)/data:/app/data:ro geoip-service:latest
+docker run -d --name geoip-service -p 8080:8080 -p 9090:9090 -v $(pwd)/data:/app/data:ro geoip-service:latest
 ```
 
 ## API Usage
 
-### `POST /v1/check`
+### HTTP API
+
+#### `POST /v1/check`
 
 Validates if an IP address is from an allowed country.
 
@@ -72,9 +79,17 @@ Validates if an IP address is from an allowed country.
 }
 ```
 
-### Health Check
+#### Health Check
 
 - `GET /health` - Service health status
+
+### gRPC API
+
+The service also exposes a gRPC API with the same functionality. See `proto/geoip.proto` for the service definition.
+
+**Available Methods:**
+- `CheckCountry(CheckCountryRequest) -> CheckCountryResponse`
+- `Health(HealthRequest) -> HealthResponse`
 
 ### Testing
 
@@ -95,6 +110,7 @@ Environment variables:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PORT` | `8080` | HTTP server port |
+| `GRPC_PORT` | `9090` | gRPC server port |
 | `GEOIP_DB_PATH` | `./GeoLite2-Country.mmdb` | Path to MaxMind database file |
 | `LOG_LEVEL` | `info` | Log level (debug, info, warn, error) |
 
@@ -109,9 +125,12 @@ PORT=3000 LOG_LEVEL=debug go run ./cmd/geoip-server
 ├── cmd/geoip-server/     # Application entry point
 ├── internal/
 │   ├── api/              # HTTP handlers and routing
+│   ├── grpc/             # gRPC server implementation
 │   ├── config/           # Configuration management
 │   └── geoip/            # GeoIP lookup logic
+├── proto/                # Protocol buffer definitions
 ├── Dockerfile            # Docker container definition
+├── openapi.yaml          # OpenAPI specification
 └── README.md            # This file
 ```
 

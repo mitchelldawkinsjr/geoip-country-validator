@@ -7,6 +7,7 @@ import (
 
 type Config struct {
 	Port     int
+	GRPCPort int
 	DBPath   string
 	LogLevel string
 }
@@ -14,6 +15,7 @@ type Config struct {
 func Load() *Config {
 	return &Config{
 		Port:     getEnvAsInt("PORT", 8080),
+		GRPCPort: getEnvAsInt("GRPC_PORT", 9090),
 		DBPath:   getEnv("GEOIP_DB_PATH", "./GeoLite2-Country.mmdb"),
 		LogLevel: getEnv("LOG_LEVEL", "info"),
 	}
